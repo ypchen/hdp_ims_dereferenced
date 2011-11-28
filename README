@@ -1,0 +1,172 @@
+前提
+	奠基於 iMax.Live 韌體 20110401 (執行 lighttpd + php)
+
+功能
+	可用來自行建立 IMS 的 php 架構、亦可直接使用目前已實作的範例
+
+取得
+	1. 正常開發版本 (使用 symbolic links 來避免檔案內容重覆)
+		由
+			https://github.com/ypchen/hdp_ims
+		下載，或使用 git clone 取得
+			git clone git://github.com/ypchen/hdp_ims.git
+	2. dereferenced 版本 (適合用於無法處理 symbolic links 之系統)
+		由
+			https://github.com/ypchen/hdp_ims_dereferenced
+		下載，或使用 git clone 取得
+			git clone git://github.com/ypchen/hdp_ims_dereferenced.git
+
+說明
+	1. 有興趣的人可以使用這整套 php code 來建立自己 (或者公開給別人使用) 的 IMS
+	2. 也可以直接使用我目前實作來當範例的幾個站台:
+		A. 蘋果動新聞 (連播、單播)
+		B. 楓林網
+		C. sugoideas
+		D. 卡提諾影音
+		E. 媒體新聞 on YouTube
+			香港蘋果動新聞、台灣蘋果動新聞、半島電視新聞、台視、中視、華視、民視、公視、東森、中天、聯合新聞網
+		F. YouTube 搜索、設定、播放清單
+			1080p Trailers、字幕測試影片
+			YouTube 搜索 (本機 hdp_input、播放機內建、線上 hdp_input)
+			YouTube 字幕語言設定
+			YouTube 解析度設定
+		G. TED Talks on YouTube / podcast
+		H. CNN 影音 podcast
+		I. IMS 搜索: 以本機 hdp_input 或播放機機內建或線上 hdp_input 搭配 HDPfans/HAOIMS 進行搜索
+		J. 近三十個成人影片網站
+	3. 兩種層級搭配 (01_base 和 02_query) 可做出數種不同觀看流程
+		A. 蘋果動新聞 (連播、單播)
+				01 -> 01 -> 02 -> 02 -> 播放 (兩種播放模式: 連續、單段)
+		B. 楓林網
+			a. 每日熱門、最新節目
+				01 -> 02 -> 播放
+			b. 綜藝節目、偶像戲劇
+				01 -> 02 -> 02 -> 播放
+		C. sugoideas
+				01 -> 02 -> 02 -> 播放
+		D. 卡提諾影音
+				01 -> 02 -> 02 -> 播放
+		E. 媒體新聞 on YouTube
+		F. YouTube 搜索、設定、播放清單
+				01 -> 02 -> 播放
+		G. TED Talks on YouTube / podcast
+			a. 中文字幕 on YouTube
+				01 -> 02 -> 播放
+			b. podcast
+				01 -> podcast
+		H. CNN 影音 podcast
+				01 -> podcast
+		I. IMS 搜索
+				01 -> HDPfans/HAOIMS 搜索各大站台
+		J. 近三十個成人影片網站
+				01 -> 01 -> 02 -> 播放
+				01 -> 02 -> 播放
+				01 -> podcast
+	4. 可以播放 YouTube 的搜索結果、頻道、以及公開的播放清單
+	5. 內建歷史自動記錄功能: 最近瀏覽、最近觀看、本地收藏
+	6. 具有當網站錯誤發生時通知管理者進行處理的功能
+	7. 具有使用 MySQL database 記錄使用者動作的功能
+	8. IMS 線上搜索可讓使用者自訂由 hdp_input 模組所做成的線上輸入功能
+	9. [v1.4] youtube.video.php 將會由 IMS 來源網站載入 scripts/youtube.video.php 來執行
+	10. [v1.6] 可播放 YouTube 字幕 (請將 v1.6.2 版之 youtube.video.php 刷入本機)
+	11. [v1.6.2] 提供存放於 github 之 dereferenced 版本，以利追蹤版本變更時檔案之異同
+
+使用
+	1. 直接放在本機使用
+		步驟一:
+		將 adult/ common/ scripts/ video/ 這些目錄放在 /opt/share/www 下
+		即可在 menu.rss 或其他適當的地方加入 (port 8081 是 iMax 韌體預設)
+			<item>
+				<title>IMS: video</title>
+				<link>http://localhost:8081/video/scripts/siteList.php</link>
+				<mediaDisplay />
+			</item>
+		或
+			<item>
+				<title>IMS: adult</title>
+				<link>http://localhost:8081/adult/scripts/siteList.php</link>
+				<mediaDisplay />
+			</item>
+
+		步驟二:
+		common/settings.php 裡的 $imsUseCurl 要設定成 false，亦即
+			$imsUseCurl = false;
+
+		如果本機有裝
+			https://github.com/ypchen/hdp_filemanager
+		的話，最新版本的同名檔案都已經同步成一樣的了，所以不必擔心會有衝突
+
+	2. 建立 IMS 網站
+		將 adult/ common/ video/ 這些目錄放在適當的地方 (參考安裝在本機的做法)
+		然後使用正確的 URL 即可
+
+		如果是建立 IMS 網站的話，YouTube 上的影片仍然必由本機進行處理而得到 URL
+		因此，scripts/ 這個目錄 (裡面只有一個 youtube.video.php 用來處理 back-end
+		為 YouTube 的網站，如範例中的楓林網和 sugoideas) 還是必須放在本機
+
+	3. 我直接把這組 code 建立成一個範例網站，有興趣的人可以直接用用看
+		楓林網、sugoideas、TED Talks 中文字幕版等 back-end 是 YouYube 的則須參考下述說明
+			<item>
+				<title>IMS: video</title>
+				<link>http://ims.hostoi.com/video/scripts/siteList.php</link>
+				<mediaDisplay />
+			</item>
+
+	4. 有關 youtube.video.php
+		目前程式假設 youtube.video.php 在本機上的 URL 是 (port 8081 是 iMax 韌體預設)
+			http://localhost:8081/scripts/youtube.video.php
+		如果有人要建立 IMS 網站，但是想使用該 IMS 網站的使用者們的本機上
+		的 youtube.video.php 有可能在不同位置，在這種情形下，使用者可以藉由提供
+			youtube_video
+		這個變數讓 IMS 網站知道自己的 youtube.video.php 放置的 URL，例如
+			http://ims.your.site/video/scripts/siteList.php?youtube_video=http%3A%2F%2Flocalhost%3A2345%2Futils%2Fyoutube.video.php
+		就是放在 utils 下，而 lighttpd 使用的 port 為 2345
+
+		--- v1.4 增加了 youtube.video.php 兩個重要的新功能:
+
+		A. 由 IMS 來源網站載入 scripts/youtube.video.php 來執行
+			如此一來，只要將 v1.4 這份 youtube.video.php 刷入機中，以後應該就不必再更新這個檔案
+
+			這個功能是由 IMS 來源網站透過 yv_rmt_src 這個 URL 變數來告知 youtube.video.php
+			下載位置，如果有需要的話，可以手動設定或取消此功能
+
+			如果整個 IMS code 是放在本機執行的話，自然就沒有這個功能了 (因為 IMS 來源是本機)
+
+		B. 可以用 yv_fmt_prefs 來指定 YouTube 的解析度喜好，預設為 22,35,34,18,5
+			請參考 http://en.wikipedia.org/wiki/YouTube
+
+			也可以把喜好放在本機檔案 /usr/local/etc/dvdplayer/ims_yv_fmt_prefs.dat
+			放在這個本機檔案的優先次序高於使用 yv_fmt_prefs 來進行的設定
+
+			在 IMS code 中，有提供了幾個讓使用者可以簡單在本機上設定的功能:
+				最高 1920x1080、最高 1280x720、最高 854x480、以及取消本機解析度設定
+
+			觀賞 1080p Trailers 和動感小站等頻道，應該可以看出差別
+
+		--- v1.6 增加了 youtube 影片的字幕功能: 設定載入喜好後即可顯示有提供 CC 的 youtube 影片
+
+		A. 請將 v1.6.2 版之 youtube.video.php 刷入本機
+			希望將來真的不必再更新本機內的這個檔案
+
+		B. 影片開始會比平常慢一些，因為要先下載字幕
+
+		C. 因為播放機的時間解析度只能到約 0.1 秒，所以字幕的出現和消失可能會有點不順
+			在影片一開始的兩、三分鐘內，因為 onRefresh 被叫用的間隔並不穩定，所以可能會不太順
+			有些播放機可能無法順利顯示字幕 (我自己好幾部 HD300B plus 就有不行的)
+
+		D. 按 [藍] 可切換字幕的顯示; 按 [信息] 則有影片相關資訊:
+			(1) 34/640x360/9/0/115 為 youtube 解析度資訊
+			(2) 字幕相關資訊
+				[-] 表示使用者設定為不自動載入字幕
+				{-} 表示此影片不提供字幕
+				[#] 表示此影片提供的字幕中，並無使用者接受的
+				[X] 表示字幕下載失敗
+						例如: How to Use EndNote in 7 Minutes，我沒下載成功過
+						而 Bill Gates 的 TEDTalk，英文字幕可下載，正體中文字幕則不行
+				[zh-Hant]{zh-Hant,en} 表示正在使用正體中文(zh-Hant)字幕
+						而此影片提供正體中文與英文字幕
+
+備註
+	1. 這個 php IMS 架構發展之初，參考了 iMax 韌體中的許多部分，在此表示感謝！
+	2. 因為我使用的 image 都是去抓那些網站的 logo 還有用 images.google.com 從網上抓下來的，
+		所以無法一併 release 在 code 中，請見諒。

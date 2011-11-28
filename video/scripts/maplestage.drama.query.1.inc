@@ -1,0 +1,18 @@
+<?php
+	$rowCount    = 11;
+	$columnCount = 3;
+	$itemWidthPC = 31.67;
+
+	$link = 'http://www.maplestage.net/drama/';
+	$html = yp_file_get_contents($link);
+	include('05_check.file_contents.inc');
+
+	$htmlBody = explode(' id="show_table"', $html);
+
+	$videos = explode('<tr>', trim(str_between($htmlBody[1], '<tbody>', '</tbody>')));
+	unset($videos[0]);
+	$videos = array_values($videos);
+
+	$itemTotal = count($videos);
+	include('05_check.base.inc');
+?>
