@@ -135,45 +135,31 @@
 	redrawDisplay();
 </onRefresh>
 
-<mediaDisplay name="threePartsView"
+<mediaDisplay name="photoView"
+	showHeader="no"
+	showDefaultInfo="no"
+	autoSelectItem="yes"
+	itemGapXPC="0"
+	itemGapYPC="0"
 	itemXPC="<?php echo $itemXPC; ?>"
 	itemYPC="<?php echo $itemYPC; ?>"
 	itemWidthPC="<?php echo $itemWidthPC; ?>"
 	itemHeightPC="<?php echo $itemHeightPC; ?>"
-	itemImageXPC="0"
-	itemImageWidthPC="0"
-	itemImageHeightPC="0"
-	itemGap="0"
-	itemPerPage="<?php echo $itemPerPage; ?>"
-	itemBackgroundColor="0:0:0"
-	bottomYPC="90"
+	itemAlignt="center"
+	viewAreaXPC="0"
+	viewAreaYPC="0"
+	viewAreaWidthPC="100"
+	viewAreaHeightPC="100"
+	rowCount="<?php echo $rowCount; ?>"
+	columnCount="<?php echo $columnCount; ?>"
+	centerXPC="<?php echo $itemXPC; ?>"
+	centerYPC="<?php echo $itemYPC; ?>"
+	centerWidthPC="100"
+	centerHeightPC="100"
+	drawItemBorder="yes"
 	backgroundColor="0:0:0"
-	showHeader="no"
-	showDefaultInfo="no"
-	capXPC="<?php echo $itemXPC; ?>"
-	capYPC="<?php echo $itemYPC; ?>"
-	capWidthPC="50"
-	capHeightPC="64"
-	autoSelectMenu="no"
-	autoSelectItem="no"
-	selectMenuOnRight="no"
-	sideLeftWidthPC="0"
-	sideRightWidthPC="0"
-	headerImageWidthPC="0"
-	sliding="no"
-	imageFocus=""
-	idleImageWidthPC="10"
-	idleImageHeightPC="10"
-	unFocusFontColor="140:140:140"
-	focusFontColor="255:255:255"
-	popupXPC = "40"
-	popupYPC = "55"
-	popupWidthPC = "22.3"
-	popupHeightPC = "5.5"
-	popupFontSize = "13"
-	popupBorderColor="28:35:51"
-	popupForegroundColor="255:255:255"
-	popupBackgroundColor="28:35:51"
+	itemBackgroundColor="0:0:0"
+	itemBorderColor="0:0:0"
 >
 	<image redraw="no"
 		offsetXPC="5" offsetYPC="2.5"
@@ -204,47 +190,6 @@
 		</script>
 	</text>
 
-	<text redraw="yes" align="left"
-		fontSize="16" lines="5"
-		offsetXPC="60" offsetYPC="<?php echo $itemYPC+(((7*$itemHeightPC)-$myImgHeight)/2); ?>"
-		widthPC="<?php echo $myImgWidth; ?>" heightPC="<?php echo $myImgHeight; ?>"
-		backgroundColor="0:0:0">
-		<script>
-			"";
-		</script>
-	</text>
-
-	<image redraw="yes"
-		offsetXPC="60" offsetYPC="<?php echo $itemYPC+(((7*$itemHeightPC)-$myImgHeight)/2); ?>"
-		widthPC="<?php echo $myImgWidth; ?>" heightPC="<?php echo $myImgHeight; ?>"
-		backgroundColor="0:0:0">
-		<script>
-			img;
-		</script>
-	</image>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="5"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(7*$itemHeightPC)); ?>"
-		widthPC="<?php echo ($myImgWidth+1); ?>" heightPC="<?php echo (4*$itemHeightPC)+1; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			"";
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="5"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(7*$itemHeightPC)); ?>"
-		widthPC="<?php echo ($myImgWidth+1); ?>" heightPC="<?php echo (4*$itemHeightPC); ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			note;
-		</script>
-	</text>
-
 	<text redraw="no" align="left"
 		fontSize="<?php echo $themeTipsFontSize; ?>" lines="1"
 		offsetXPC="0" offsetYPC="<?php echo ($itemYPC+(11*$itemHeightPC)); ?>"
@@ -255,10 +200,10 @@
 			if ((inputNumCount == 0) ||
 					((inputNumCount == itemCountDigits) &amp;&amp;
 					((curNumVal &lt; 1) || (curNumVal &gt; itemCount)))) {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後;" + historyTips + " [數字直選]";
+				str = "[↕][↔]移動; [上下頁]最前後;" + historyTips + " [數字直選]";
 			}
 			else {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後;" + historyTips + " 第 " + curNumVal + " 項";
+				str = "[↕][↔]移動; [上下頁]最前後;" + historyTips + " 第 " + curNumVal + " 項";
 			}
 			str + message;
 		</script>
@@ -352,8 +297,6 @@
 			if (
 				(userInput == "pagedown") ||
 				(userInput == "pageup") ||
-				(userInput == "left") ||
-				(userInput == "right") ||
 				(userInput == "one") ||
 				(userInput == "two") ||
 				(userInput == "three") ||
@@ -370,14 +313,6 @@
 				}
 				else if (userInput == "pageup") {
 					idx = 0;
-				}
-				else if (userInput == "right") {
-					idx -= -<?php echo $itemPerPage; ?>;
-					if(idx &gt;= itemCount) idx = itemCount-1;
-				}
-				else if (userInput == "left") {
-					idx -= <?php echo $itemPerPage; ?>;
-					if(idx &lt; 0) idx = 0;
 				}
 				else {
 					if (userInput == "one") {

@@ -106,34 +106,29 @@
 	redrawDisplay();
 </onRefresh>
 
-<mediaDisplay name="threePartsView"
+<mediaDisplay name="photoView"
 	showHeader="no"
 	showDefaultInfo="no"
-	autoSelectMenu="no"
-	autoSelectItem="no"
-	selectMenuOnRight="no"
-	itemXPC="<?php echo $itemXPC; ?>"
-	itemYPC="<?php echo $itemYPC; ?>"
+	autoSelectItem="yes"
+	itemGapXPC="0"
+	itemGapYPC="0"
 	itemWidthPC="<?php echo $itemWidthPC; ?>"
 	itemHeightPC="<?php echo $itemHeightPC; ?>"
-	itemPerPage="<?php echo $itemPerPage; ?>"
-	itemImageWidthPC="0"
-	itemImageHeightPC="0"
-	itemGap="0"
-	sliding="no"
-	capXPC="<?php echo $itemXPC; ?>"
-	capYPC="<?php echo $itemYPC; ?>"
-	capWidthPC="50"
-	capHeightPC="64"
-	sideLeftWidthPC="0"
-	sideRightWidthPC="0"
-	headerImageWidthPC="0"
+	itemAlignt="center"
+	viewAreaXPC="0"
+	viewAreaYPC="0"
+	viewAreaWidthPC="100"
+	viewAreaHeightPC="100"
+	rowCount="<?php echo $rowCount; ?>"
+	columnCount="<?php echo $columnCount; ?>"
+	centerXPC="<?php echo $itemXPC; ?>"
+	centerYPC="<?php echo $itemYPC; ?>"
+	centerWidthPC="100"
+	centerHeightPC="100"
+	drawItemBorder="yes"
 	backgroundColor="0:0:0"
 	itemBackgroundColor="0:0:0"
-	bottomYPC="90"
-	imageFocus=""
-	idleImageWidthPC="10"
-	idleImageHeightPC="10"
+	itemBorderColor="0:200:0"
 >
 	<image redraw="no"
 		offsetXPC="5" offsetYPC="2.5"
@@ -144,7 +139,7 @@
 		</script>
 	</image>
 
-	<text redraw="no" align="center" fontSize="26"
+	<text align="center" fontSize="26"
 		offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="20"
 		backgroundColor="<?php echo $themeMainBackgroundColor; ?>"
 		foregroundColor="<?php echo $themeMainForegroundColor; ?>">
@@ -163,69 +158,6 @@
 		</script>
 	</text>
 
-	<text redraw="yes" align="left"
-		fontSize="16" lines="5"
-		offsetXPC="60" offsetYPC="<?php echo $itemYPC+(((7*$itemHeightPC)-$myImgHeight)/2); ?>"
-		widthPC="<?php echo $myImgWidth; ?>" heightPC="<?php echo $myImgHeight; ?>"
-		backgroundColor="0:0:0">
-		<script>
-			"";
-		</script>
-	</text>
-
-	<image redraw="yes"
-		offsetXPC="60" offsetYPC="<?php echo $itemYPC+(((7*$itemHeightPC)-$myImgHeight)/2); ?>"
-		widthPC="<?php echo $myImgWidth; ?>" heightPC="<?php echo $myImgHeight; ?>"
-		backgroundColor="0:0:0">
-		<script>
-			img;
-		</script>
-	</image>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(7*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteOne;
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(8*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteTwo;
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(9*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteThree;
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(10*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteFour;
-		</script>
-	</text>
-
 	<text redraw="no" align="left"
 		fontSize="<?php echo $themeTipsFontSize; ?>" lines="1"
 		offsetXPC="0" offsetYPC="<?php echo ($itemYPC+(11*$itemHeightPC)); ?>"
@@ -236,10 +168,10 @@
 			if ((inputNumCount == 0) ||
 					((inputNumCount == itemCountDigits) &amp;&amp;
 					((curNumVal &lt; 1) || (curNumVal &gt; itemCount)))) {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; [數字直選]";
+				str = "[↕][↔]移動; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; [數字直選]";
 			}
 			else {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; 第 " + curNumVal + " 項";
+				str = "[↕][↔]移動; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; 第 " + curNumVal + " 項";
 			}
 			str + message;
 		</script>
@@ -333,16 +265,13 @@
 			ret = "false";
 			message = "";
 			userInput = currentUserInput();
-
 			idx = Integer(getFocusItemIndex());
 			if (
 				(userInput == "pagedown") ||
 				(userInput == "pageup") ||
-				(userInput == "left") ||
-				(userInput == "right") ||
 				(userInput == "option_green") ||
-				(userInput == "option_yellow") ||
 				(userInput == "option_blue") ||
+				(userInput == "display") ||
 				(userInput == "one") ||
 				(userInput == "two") ||
 				(userInput == "three") ||
@@ -359,14 +288,6 @@
 				}
 				else if (userInput == "pageup") {
 					idx = 0;
-				}
-				else if (userInput == "right") {
-					idx -= -<?php echo $itemPerPage; ?>;
-					if(idx &gt;= itemCount) idx = itemCount-1;
-				}
-				else if (userInput == "left") {
-					idx -= <?php echo $itemPerPage; ?>;
-					if(idx &lt; 0) idx = 0;
 				}
 				else if (userInput == "option_green") {
 					jumpToLink("historyItem");
@@ -502,7 +423,7 @@
 	<title><?php echo $pageTitle; ?></title>
 
 <?php
-	if ($page > 1) {
+	if($page > 1) {
 ?>
 	<item>
 		<?php
@@ -529,7 +450,7 @@
 		<link><?php echo $url;?></link>
 		<annotation>上一頁</annotation>
 		<image><?php echo myImage('left'); ?></image>
-		<mediaDisplay name="threePartsView" />
+		<mediaDisplay name="photoView" />
 	</item>
 <?php } ?>
 
@@ -567,7 +488,7 @@
 		<link><?php echo $url;?></link>
 		<annotation>下一頁</annotation>
 		<image><?php echo myImage('right'); ?></image>
-		<mediaDisplay name="threePartsView" />
+		<mediaDisplay name="photoView" />
 	</item>
 <?php } ?>
 

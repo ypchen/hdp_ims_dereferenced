@@ -128,7 +128,7 @@
 	drawItemBorder="yes"
 	backgroundColor="0:0:0"
 	itemBackgroundColor="0:0:0"
-	itemBorderColor="200:200:0"
+	itemBorderColor="0:200:0"
 >
 	<image redraw="no"
 		offsetXPC="5" offsetYPC="2.5"
@@ -450,7 +450,7 @@
 		<link><?php echo $url;?></link>
 		<annotation>上一頁</annotation>
 		<image><?php echo myImage('left'); ?></image>
-		<mediaDisplay name="threePartsView" />
+		<mediaDisplay name="photoView" />
 	</item>
 <?php } ?>
 
@@ -461,7 +461,7 @@
 ?>
 
 <?php
-	if($page > 0) {
+	if (($page > 0) && (!isset($pageMax) || ($page < $pageMax))) {
 ?>
 	<item>
 		<?php
@@ -488,7 +488,7 @@
 		<link><?php echo $url;?></link>
 		<annotation>下一頁</annotation>
 		<image><?php echo myImage('right'); ?></image>
-		<mediaDisplay name="threePartsView" />
+		<mediaDisplay name="photoView" />
 	</item>
 <?php } ?>
 
