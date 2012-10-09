@@ -5,9 +5,8 @@
 <?php
 	require('00_prefix.php');
 	$myName = basename($myScriptName, '.php');
-	$myBaseName = basename($myName, '.query');
+	$myBaseName = $myName;
 ?>
-<onEnter>
 <?php
 	include('06_get.query.inc');
 
@@ -15,14 +14,11 @@
 
 	if (isset($extra)) {
 		// $extra may be changed by included scripts
-		$extra_02_query = $extra;
+		$extra_01_base = $extra;
 	}
 	else {
-		unset($extra_02_query);
+		unset($extra_01_base);
 	}
-
-	// To receive $extra propagated from included scripts
-	unset($extra_02_query_from_inc);
 
 	$itemTotal  = 0;
 	$pass_check = true;
@@ -33,14 +29,9 @@
 		$pass_check = false;
 	}
 
-	// Replace the original $extra by the explicitly propagated one
-	if (isset($extra_02_query_from_inc)) {
-		$extra_02_query = $extra_02_query_from_inc;
-	}
-
 	// Default display parameters
 	if (!isset($themeMainForegroundColor)) $themeMainForegroundColor = '255:255:255';
-	if (!isset($themeMainBackgroundColor)) $themeMainBackgroundColor = '150:10:105';
+	if (!isset($themeMainBackgroundColor)) $themeMainBackgroundColor = '10:105:150';
 	if (!isset($themeTextForegroundColor)) $themeTextForegroundColor = '255:255:255';
 	if (!isset($themeTextBackgroundColor)) $themeTextBackgroundColor = '0:0:0';
 	if (!isset($themeTipsForegroundColor)) $themeTipsForegroundColor = '255:255:0';
@@ -53,26 +44,12 @@
 	if (!isset($themeItemFontSizeUnfocused)) $themeItemFontSizeUnfocused = $themeItemFontSizeFocused;
 	if (!isset($themeTipsFontSize)) $themeTipsFontSize = '16';
 
-	$titleComponents = explode('.', $myBaseName);
-	$pageTitleBaseElements = explode('__', $titleComponents[0]);
-	$pageTitleBase = $pageTitleBaseElements[0];
-
-	$pageTitle = $pageTitleBase;
-	if (isset($cat)) {
-		$pageTitle = $pageTitle . ': ' . $cat;
-	}
-	if ($page > 0) {
-		$pageTitle = $pageTitle . ' (第 ' . $page . ' 頁)';
-	}
-
 	// Create my own link
 	$params  = str_replace('&', '&amp;', $_SERVER['QUERY_STRING']);
 	$currUrl = $scriptsURLprefix . '/' . $myName . '.php?' . $params;
-
-	// Create history link
-	$historyUrl = $scriptsURLprefix . '/history.php?uid=' . $user_id;
 ?>
 
+<onEnter>
 	focus = 0;
 	message = "";
 	inputNumCount = 0;
@@ -87,19 +64,61 @@
 	dataWatchMax    = <?php echo $maxWatch; ?>;
 	dataFavoriteMax = <?php echo $maxFavorite; ?>;
 
-	/* Static items */
-	itemCount = getPageInfo("itemCount");
-	setRefreshTime(200);
-
 	history = <?php echo $history; ?>;
+	historyTips = "";
 	if (history == 0) {
-		/* Parameters */
-		dataFile   = dataBrowse;
-		dataMax    = dataBrowseMax;
-		dataType   = "2";
-		dataTitle  = "<?php echo $pageTitle; ?>";
-		dataLink   = "<?php echo $currUrl; ?>";
-		<?php include('08_history.record.inc'); ?>
+		/* Static items */
+		itemCount = getPageInfo("itemCount");
+		setRefreshTime(200);
+	}
+	else {
+		if (history == 1) {
+			/* 最近瀏覽 */
+			dataFileThisPage = dataBrowse;
+		}
+		else if (history == 2) {
+			/* 最近觀看 */
+			dataFileThisPage = dataWatch;
+		}
+		else if (history == 3) {
+			/* 本地收藏 */
+			dataFileThisPage = dataFavorite;
+		}
+		else {
+			dataFileThisPage = "";
+		}
+
+		historyTips = " [快退]移上; [快進]移下; [紅]刪除項目; [黃]刪除全部;";
+
+		userMenuFile = getStoragePath("tmp") + "ims.<?php echo $imsDirectory; ?>.history." + history + ".rss.dat";
+		userMenuItem = readStringFromFile(userMenuFile);
+		if (userMenuItem != null) {
+			userMenuItem = Integer(userMenuItem);
+		}
+		else {
+			userMenuItem = 0;
+		}
+		setFocusItemIndex(userMenuItem);
+
+		dataFile   = dataFileThisPage;
+		dataArray  = readStringFromFile(dataFile);
+		typeArray  = null;
+		titleArray = null;
+		linkArray  = null;
+		itemSize = 0;
+		k = 0;
+		while (getStringArrayAt(dataArray, k) != null) {
+			typeArray  = pushBackStringArray(typeArray,  getStringArrayAt(dataArray, k));
+			k = k+1;
+			titleArray = pushBackStringArray(titleArray, getStringArrayAt(dataArray, k));
+			k = k+1;
+			linkArray  = pushBackStringArray(linkArray,  getStringArrayAt(dataArray, k));
+			k = k+1;
+			itemSize = itemSize+1;
+		}
+
+		/* Dynamic items */
+		itemCount = itemSize;
 	}
 
 	x = itemCount;
@@ -144,6 +163,17 @@
 	imageFocus=""
 	idleImageWidthPC="10"
 	idleImageHeightPC="10"
+	itemImageXPC="0"
+	unFocusFontColor="140:140:140"
+	focusFontColor="255:255:255"
+	popupXPC = "40"
+	popupYPC = "55"
+	popupWidthPC = "22.3"
+	popupHeightPC = "5.5"
+	popupFontSize = "13"
+	popupBorderColor="28:35:51"
+	popupForegroundColor="255:255:255"
+	popupBackgroundColor="28:35:51"
 >
 	<image redraw="no"
 		offsetXPC="5" offsetYPC="2.5"
@@ -154,8 +184,9 @@
 		</script>
 	</image>
 
-	<text redraw="no" align="center" fontSize="26"
-		offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="20"
+	<text align="center" fontSize="26"
+		offsetXPC="0" offsetYPC="0"
+		widthPC="100" heightPC="20"
 		backgroundColor="<?php echo $themeMainBackgroundColor; ?>"
 		foregroundColor="<?php echo $themeMainForegroundColor; ?>">
 		<script>
@@ -193,46 +224,24 @@
 	</image>
 
 	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
+		fontSize="16" lines="5"
 		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(7*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
+		widthPC="<?php echo ($myImgWidth+1); ?>" heightPC="<?php echo (4*$itemHeightPC)+1; ?>"
 		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
 		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
 		<script>
-			noteOne;
+			"";
 		</script>
 	</text>
 
 	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(8*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
+		fontSize="16" lines="5"
+		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(7*$itemHeightPC)); ?>"
+		widthPC="<?php echo ($myImgWidth+1); ?>" heightPC="<?php echo (4*$itemHeightPC); ?>"
 		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
 		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
 		<script>
-			noteTwo;
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(9*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteThree;
-		</script>
-	</text>
-
-	<text redraw="yes" align="left"
-		fontSize="16" lines="1"
-		offsetXPC="59" offsetYPC="<?php echo ($itemYPC+(10*$itemHeightPC)); ?>"
-		widthPC="41" heightPC="<?php echo $itemHeightPC; ?>"
-		backgroundColor="<?php echo $themeTextBackgroundColor; ?>"
-		foregroundColor="<?php echo $themeTextForegroundColor; ?>">
-		<script>
-			noteFour;
+			note;
 		</script>
 	</text>
 
@@ -246,10 +255,10 @@
 			if ((inputNumCount == 0) ||
 					((inputNumCount == itemCountDigits) &amp;&amp;
 					((curNumVal &lt; 1) || (curNumVal &gt; itemCount)))) {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; [數字直選]";
+				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後;" + historyTips + " [數字直選]";
 			}
 			else {
-				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後; [綠]至收藏夾; [黃]收藏本頁; [藍]收藏項目; 第 " + curNumVal + " 項";
+				str = "[↕]±1; [↔]±<?php echo $itemPerPage; ?>; [上下頁]最前後;" + historyTips + " 第 " + curNumVal + " 項";
 			}
 			str + message;
 		</script>
@@ -276,19 +285,14 @@
 	<idleImage>image/<?php echo $idleImagePrefix; ?>8.png</idleImage>
 
 	<itemDisplay>
-		<text align="left" lines="1"
-			offsetXPC="0" offsetYPC="0"
-			widthPC="100" heightPC="100">
+		<text align="left" lines="1" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 			<script>
 				idx = getQueryItemIndex();
 				focus = getFocusItemIndex();
 				if(focus == idx) {
-					itemTitle  = getItemInfo(idx, "title");
-					noteOne    = getItemInfo(idx, "note_one");
-					noteTwo    = getItemInfo(idx, "note_two");
-					noteThree  = getItemInfo(idx, "note_three");
-					noteFour   = getItemInfo(idx, "note_four");
-					img        = getItemInfo(idx, "image");
+					itemTitle = getItemInfo(idx, "title");
+					note = getItemInfo(idx, "note");
+					img = getItemInfo(idx, "image");
 					if (img == null) {
 						img = "<?php echo siteImage($myBaseName); ?>";
 					}
@@ -350,9 +354,6 @@
 				(userInput == "pageup") ||
 				(userInput == "left") ||
 				(userInput == "right") ||
-				(userInput == "option_green") ||
-				(userInput == "option_yellow") ||
-				(userInput == "option_blue") ||
 				(userInput == "one") ||
 				(userInput == "two") ||
 				(userInput == "three") ||
@@ -377,49 +378,6 @@
 				else if (userInput == "left") {
 					idx -= <?php echo $itemPerPage; ?>;
 					if(idx &lt; 0) idx = 0;
-				}
-				else if (userInput == "option_green") {
-					jumpToLink("historyItem");
-					redrawDisplay();
-				}
-				else if (userInput == "option_yellow") {
-					/* Parameters */
-					dataFile   = dataFavorite;
-					dataMax    = dataFavoriteMax;
-					dataType   = "2";
-					dataTitle  = "<?php echo $pageTitle; ?>";
-					dataLink   = "<?php echo $currUrl; ?>";
-					<?php include('08_history.record.inc'); ?>
-					message    = " -- 本頁已收藏";
-				}
-				else if (userInput == "option_blue") {
-					/* Parameters */
-					dataFile   = dataFavorite;
-					dataMax    = dataFavoriteMax;
-					dataTitle  = getItemInfo(idx, "title");
-					dataLink   = getItemInfo(idx, "link");
-					clickPlay  = getItemInfo(idx, "click_play");
-					if ((dataTitle == "上一頁") || (dataTitle == "下一頁")) {
-						message = " -- 無法直接收藏: " + dataTitle;
-					}
-					else {
-						dataTitle  = "<?php echo $pageTitleBase; ?>: " + dataTitle;
-						if (clickPlay != null) {
-							dataType   = "1";
-							if (clickPlay == "yes") {
-								dlok = loadXMLFile(dataLink);
-								if (dlok != null) {
-									dataType = "0";
-									dataLink = getXMLText("rss", "channel", "item", "link");
-								}
-							}
-						}
-						else {
-							dataType   = "2";
-						}
-						<?php include('08_history.record.inc'); ?>
-						message = " -- 項目已收藏";
-					}
 				}
 				else {
 					if (userInput == "one") {
@@ -481,24 +439,93 @@
 				redrawDisplay();
 				ret = "true";
 			}
-			else if (userInput == "enter") {
-				if (getItemInfo(idx, "click_play") == "yes") {
-					showIdle();
-					dlok = loadXMLFile(getItemInfo(idx, "link"));
-					if (dlok != null) {
-						realURL = getXMLText("rss", "channel", "item", "link");
-						if ((history == 0) &amp;&amp; (realURL != null) &amp;&amp; (realURL != "")) {
+			else if (history &gt; 0) {
+				if (userInput == "enter") {
+					if ((history == 2) || (history == 3)) {
+						if (history == 3) {
+							writeStringToFile(userMenuFile, idx);
+						}
+						if (Integer(getStringArrayAt(typeArray, idx)) == 0) {
+
+							showIdle();
+							realURL = getStringArrayAt(linkArray, idx);
+
 							/* Parameters */
 							dataFile   = dataWatch;
 							dataMax    = dataWatchMax;
 							dataType   = "0";
-							dataTitle  = "<?php echo $pageTitleBase; ?>: " + getItemInfo(idx, "title");
+							dataTitle  = getStringArrayAt(titleArray, idx);
 							dataLink   = realURL;
 							<?php include('08_history.record.inc'); ?>
+
+							/* Play the URL */
+							playItemURL(realURL, 0);
+							cancelIdle();
+
+							/* refresh this page */
+							jumpToLink("refreshItem");
+							redrawDisplay();
+
+							ret = "true";
 						}
-						playItemURL(realURL, 0);
 					}
-					cancelIdle();
+				}
+				else if (userInput == "option_red") {
+					dataFile  = dataFileThisPage;
+					dataArray = readStringFromFile(dataFile);
+					strIdx    = Add(Add(Add(idx, idx), idx), 2);
+					dataArray = deleteStringArrayAt(dataArray, strIdx);
+					strIdx    = strIdx-1;
+					dataArray = deleteStringArrayAt(dataArray, strIdx);
+					strIdx    = strIdx-1;
+					dataArray = deleteStringArrayAt(dataArray, strIdx);
+					writeStringToFile(dataFile, dataArray);
+
+					/* refresh this page */
+					jumpToLink("refreshItem");
+					redrawDisplay();
+
+					ret = "true";
+				}
+				else if (userInput == "option_yellow") {
+					dataFile  = dataFileThisPage;
+					dataArray = null;
+					writeStringToFile(dataFile, dataArray);
+
+					/* refresh this page */
+					jumpToLink("refreshItem");
+					redrawDisplay();
+
+					ret = "true";
+				}
+				else if (userInput == "video_frwd") {
+					if (idx &gt; 0) {
+						dataFile   = dataFileThisPage;
+						dataIdx    = (idx-1);
+						<?php include('08_history.swap.inc'); ?>
+
+						typeArray  = dataTypes;
+						titleArray = dataTitles;
+						linkArray  = dataLinks;
+						setFocusItemIndex(dataIdx);
+
+						redrawDisplay();
+					}
+					ret = "true";
+				}
+				else if (userInput == "video_ffwd") {
+					if (idx &lt; (itemCount-1)) {
+						dataFile   = dataFileThisPage;
+						dataIdx    = idx;
+						<?php include('08_history.swap.inc'); ?>
+
+						typeArray  = dataTypes;
+						titleArray = dataTitles;
+						linkArray  = dataLinks;
+						setFocusItemIndex(dataIdx-(-1));
+
+						redrawDisplay();
+					}
 					ret = "true";
 				}
 			}
@@ -507,92 +534,34 @@
 	</onUserInput>
 </mediaDisplay>
 
-<channel>
-
-	<title><?php echo $pageTitle; ?></title>
-
 <?php
-	if ($page > 1) {
+	if ($history > 0) {
 ?>
-	<item>
-		<?php
-			$sThisFile = $wholeURL;
-			$url = $sThisFile . '?uid=' . $user_id  .
-				'&amp;input_method='  . urlencode($inputMethod) .
-				'&amp;youtube_video=' . urlencode($localhostYoutubeVideo) .
-				'&amp;yv_fmt_prefs='  . urlencode($youtubeVideoFmtPrefs) .
-				'&amp;yv_rmt_src='    . urlencode($youtubeVideoRemoteSource) .
-				'&amp;query=' . ($page-1) . ',';
-			if (isset($search)) {
-				$url = $url . urlencode($search);
-			}
-			$url = $url . ',';
-			if (isset($cat)) {
-				$url = $url . urlencode($cat);
-			}
-			$url = $url . ',';
-			if (isset($extra_02_query)) {
-				$url = $url . urlencode($extra_02_query);
-			}
-		?>
-		<title>上一頁</title>
-		<link><?php echo $url;?></link>
-		<annotation>上一頁</annotation>
-		<image><?php echo myImage('left'); ?></image>
-		<mediaDisplay name="threePartsView" />
-	</item>
+	<item_template>
+		<displayTitle>
+			<script>getStringArrayAt(titleArray, -1);</script>
+		</displayTitle>
+		<title>
+			<script>getStringArrayAt(titleArray, -1);</script>
+		</title>
+		<link>
+			<script>getStringArrayAt(linkArray, -1);</script>
+		</link>
+<?php
+		// Output the image tags
+		echo myLogo($myName);
+?>
+		<mediaDisplay />
+	</item_template>
 <?php } ?>
 
-<?php
-	if ($pass_check) {
-		include($myName . '.2.inc');
-	}
-?>
-
-<?php
-	if (($page > 0) && (!isset($pageMax) || ($page < $pageMax))) {
-?>
-	<item>
-		<?php
-			$sThisFile = $wholeURL;
-			$url = $sThisFile . '?uid=' . $user_id  .
-				'&amp;input_method='  . urlencode($inputMethod) .
-				'&amp;youtube_video=' . urlencode($localhostYoutubeVideo) .
-				'&amp;yv_fmt_prefs='  . urlencode($youtubeVideoFmtPrefs) .
-				'&amp;yv_rmt_src='    . urlencode($youtubeVideoRemoteSource) .
-				'&amp;query=' . ($page+1) . ',';
-			if (isset($search)) {
-				$url = $url . urlencode($search);
-			}
-			$url = $url . ',';
-			if (isset($cat)) {
-				$url = $url . urlencode($cat);
-			}
-			$url = $url . ',';
-			if (isset($extra_02_query)) {
-				$url = $url . urlencode($extra_02_query);
-			}
-		?>
-		<title>下一頁</title>
-		<link><?php echo $url;?></link>
-		<annotation>下一頁</annotation>
-		<image><?php echo myImage('right'); ?></image>
-		<mediaDisplay name="threePartsView" />
-	</item>
-<?php } ?>
-
-</channel>
+<?php include($myName . '.2.inc'); ?>
 
 <?php
 	// refresh this page
 	echo "<refreshItem>\r\n";
 	echo "\t<link>$currUrl</link>\r\n";
 	echo "</refreshItem>\r\n";
-
-	// history
-	echo "<historyItem>\r\n";
-	echo "\t<link>$historyUrl</link>\r\n";
-	echo "</historyItem>\r\n";
 ?>
 
 </rss>
