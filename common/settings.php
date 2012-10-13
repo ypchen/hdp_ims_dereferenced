@@ -1,6 +1,13 @@
 <?php
 	// Global variables
 
+	// Redirect to another host
+	$imsUseRedir   = false;
+	$imsRedirTo    = ''; 
+
+	// Time zone
+	$imsTimeZone   = "Asia/Taipei";
+
 	// Running on heroku
 	$imsOnHeroku   = false;
 	// Send mails via MailGun
@@ -14,17 +21,32 @@
 
 	// Database will be used for logging and authentication
 	$imsUseDB      = false;
+	$imsDBTimeZone = '+08:00';
 	// Database configuration
 	$imsDBHost     = 'yourDB_host';
 	$imsDBName     = 'yourDB_name';
 	$imsDBUser     = 'yourDB_username';
 	$imsDBPass     = 'yourDB_password';
+	// Remove old records
+	$imsDBToRemove         = '3 MONTH';
+	$imsDBToRemoveAPIKey   = 'Key you specified';
+	// Track requests (need to use DB and also Tempo DB on Heroku)
+	$imsTrackReq           = false;
+	$imsTrackReqAPIKey     = 'Key you specified';
+	// Tempo DB key for recording all requests
+	$imsTrackReqTempoKeyAll        = 'requests_all';
+	// Tempo DB key for recording all requests from distinct ips
+	$imsTrackReqTempoKeyDistinctIP = 'requests_distinct_ip';
 
 	// Use curl (or not) to get remote contents
 	$imsUseCurl    = true;
 
 	// Need to authenticate users?
 	$imsUseAuthentication = false;
+	// Need to record visited pages?
+	// 1. Database is needed
+	// 2. If authentication is enabled, visited pages are automatically logged
+	$imsLogVisitedPage    = true;
 
 	// Default url on the localhost to handle youtube videos
 	// it can be changed by using youtube_video
