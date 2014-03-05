@@ -1,11 +1,10 @@
 <?php
 	include('15_4_columns.inc');
 
-	$link = 'http://www.maplestage.com/show/';
-	$html = yp_file_get_contents($link);
+	$html = yp_file_get_contents($link = $search);
 	include('05_check.file_contents.inc');
 
-	$videos = explode('</a>', ($htmlToExplode = trim(str_between($html, '<div class="compact-list show">', '</div>'))));
+	$videos = explode('a>', ($htmlToExplode = trim(str_between($html, '<div class="holder">', '</div>'))));
 	//unset($videos[0]);
 	$videos = array_values($videos);
 

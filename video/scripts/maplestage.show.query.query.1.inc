@@ -1,14 +1,11 @@
 <?php
 	include('15_2_columns.inc');
 
-	$link = $search;
-	$html = yp_file_get_contents($link);
+	$html = yp_file_get_contents($link = $search);
 	include('05_check.file_contents.inc');
 
-	$htmlBody = explode('<div class="shows">', $html);
-
-	$videos = explode('<div class="show">', ($htmlToExplode = $htmlBody[1]));
-	unset($videos[0]);
+	$videos = explode('a>', ($htmlToExplode = trim(str_between($html, '<div class="holder">', '</div>'))));
+	//unset($videos[0]);
 	$videos = array_values($videos);
 
 	$itemTotal = count($videos);
