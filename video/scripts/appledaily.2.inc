@@ -14,7 +14,6 @@
 			$extra = '';
 
 			$pageStart = 0;
-			$queryLevel = '.query.query';
 			include('04_query.inc');
 		}
 	}
